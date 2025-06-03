@@ -1,1 +1,30 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.font-cooper {
+  font-family: "DM Serif Text", serif;
+}
+
+.primary {
+  background-color: #ae6639;
+}
+
+.bg-primary {
+  background-color: #f5e1c2;
+}
+
+.loader {
+    border: 6px solid #f5e1c2;
+    border-top: 6px solid #ae6639;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,59 @@
+<div
+  class="primary relative flex items-center justify-between p-4 font-extralight text-white"
+>
+  <div
+    class="font-cooper absolute top-1/2 left-4 flex -translate-y-1/2 transform flex-col text-center text-[14px] leading-3 font-semibold text-black"
+  >
+    <div class="text-[12px]">Biscoitos</div>
+    <div>Bom Chefe</div>
+  </div>
+
+  <nav class="mx-auto">
+    <ul class="flex space-x-6 text-amber-100">
+      <li>
+        <a [routerLink]="'/produtos'" class="hover:underline focus:text-black"
+          >Produtos</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="'/estoque'" class="hover:underline focus:text-black"
+          >Estoque</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="'/vendas'" class="hover:underline focus:text-black"
+          >Vendas</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="'/feiras'" class="hover:underline focus:text-black"
+          >Feiras</a
+        >
+      </li>
+    </ul>
+  </nav>
+
+  <div class="absolute top-1/2 right-4 -translate-y-1/2 transform">
+    <button
+      (click)="sair()"
+      class="rounded px-6 text-[14px] py-1 border-[1px] border-black text-black transition cursor-pointer hover:bg-amber-800 font-semibold"
+    >
+      SAIR
+    </button>
+  </div>
+</div>
+
+<div
+  class="bg-primary min-h-screen flex font-extralight flex-col items-center px-6 py-12 lg:px-8"
+>
+  <div
+    class="font-cooper leading-7 flex flex-col text-center text-3xl font-semibold mt-24"
+  >
+    <div class="text-[28px]">Biscoitos</div>
+    <div>Bom Chefe</div>
+  </div>
+
+  <div class="mt-20 font-semibold">
+    Seja bem-vindo! Selecione um item do menu acima para iniciar
+  </div>
+</div>

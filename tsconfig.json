@@ -2,6 +2,9 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+     "moduleResolution": "bundler", // ou "nodenext" ou "node16"
+    "module": "esnext", // recomendado com bundler/nodenext
+    "target": "esnext", // compatível com ESM
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
@@ -14,10 +17,9 @@
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+
     "importHelpers": true,
-    "target": "ES2022",
-    "module": "ES2022",
+
     "useDefineForClassFields": false,
     "lib": [
       "ES2022",

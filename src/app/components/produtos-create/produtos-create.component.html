@@ -1,0 +1,147 @@
+<!-- HEADER -->
+<div
+  class="primary relative flex items-center justify-between p-4 font-extralight text-white"
+>
+  <div
+    [routerLink]="'/home'"
+    class="cursor-pointer font-cooper absolute top-1/2 left-4 flex -translate-y-1/2 transform flex-col text-center text-[14px] leading-3 font-semibold text-black"
+  >
+    <div class="text-[12px]">Biscoitos</div>
+    <div>Bom Chefe</div>
+  </div>
+
+  <nav class="mx-auto">
+    <ul class="flex space-x-6 text-amber-100">
+      <li>
+        <a [routerLink]="'/produtos'" class="hover:underline focus:text-black"
+          >Produtos</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="'/estoque'" class="hover:underline focus:text-black"
+          >Estoque</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="'/vendas'" class="hover:underline focus:text-black"
+          >Vendas</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="'/feiras'" class="hover:underline focus:text-black"
+          >Feiras</a
+        >
+      </li>
+    </ul>
+  </nav>
+  <div class="absolute top-1/2 right-4 -translate-y-1/2 transform">
+    <button
+      (click)="sair()"
+      class="rounded px-6 text-[14px] py-1 border-[1px] border-black text-black transition cursor-pointer hover:bg-amber-800 font-semibold"
+    >
+      SAIR
+    </button>
+  </div>
+</div>
+
+<!-- verificar loader abaixo -->
+<ng-container *ngIf="!loading; else loader">
+  <div
+    class="bg-primary min-h-screen flex font-extralight flex-col justify-center items-center px-6 py-12 lg:px-8"
+  >
+    <div class="sm:mx-auto w-full max-w-4xl">
+      <h2 class="text-center text-2xl font-medium leading-9 text-gray-900">
+        {{ produto ? "Edição de produto" : "Cadastro de produto" }}
+      </h2>
+    </div>
+
+    <div class="mt-6 w-full max-w-4xl">
+      <form
+        class="space-y-6 p-6 rounded-lg w-full"
+        action="#"
+        method="POST"
+        [formGroup]="produtosForm"
+        (ngSubmit)="onSubmit()"
+      >
+        <div>
+          <label for="nome" class="block text-sm font-medium text-gray-700"
+            >Nome do produto</label
+          >
+          <input
+            type="text"
+            name="nome"
+            id="nome"
+            formControlName="nome"
+            class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+          />
+        </div>
+
+        <div>
+          <label for="descricao" class="block text-sm font-medium text-gray-700"
+            >Descrição</label
+          >
+          <input
+            type="text"
+            name="descricao"
+            id="descricao"
+            formControlName="descricao"
+            class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+          />
+        </div>
+
+        <div>
+          <label
+            for="preco_unitario"
+            class="block text-sm font-medium text-gray-700"
+            >Valor unitário</label
+          >
+          <input
+            type="text"
+            name="preco_unitario"
+            id="preco_unitario"
+            formControlName="preco_unitario"
+            class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+          />
+        </div>
+
+        <div>
+          <label
+            for="peso_gramas"
+            class="block text-sm font-medium text-gray-700"
+            >Peso em gramas</label
+          >
+          <input
+            type="number"
+            name="peso_gramas"
+            id="peso_gramas"
+            formControlName="peso_gramas"
+            class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+          />
+        </div>
+
+        <!-- Botão -->
+        <div>
+          <button
+            [disabled]="produtosForm.invalid"
+            type="submit"
+            [ngClass]="{
+              'bg-gray-400 cursor-not-allowed': produtosForm.invalid,
+              'primary hover:bg-amber-500': !produtosForm.invalid
+            }"
+            class="flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-smfocus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-amber-600"
+          >
+            Salvar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #loader>
+  <div
+    class="loader-container bg-primary flex justify-center items-center min-h-screen"
+  >
+    <div class="loader"></div>
+  </div>
+</ng-template>

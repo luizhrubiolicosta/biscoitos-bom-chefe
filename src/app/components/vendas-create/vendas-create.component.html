@@ -1,0 +1,208 @@
+<!-- HEADER -->
+<div
+  class="primary relative flex items-center justify-between p-4 font-extralight text-white"
+>
+  <div
+    [routerLink]="'/home'"
+    class="cursor-pointer font-cooper absolute top-1/2 left-4 flex -translate-y-1/2 transform flex-col text-center text-[14px] leading-3 font-semibold text-black"
+  >
+    <div class="text-[12px]">Biscoitos</div>
+    <div>Bom Chefe</div>
+  </div>
+
+  <nav class="mx-auto">
+    <ul class="flex space-x-6 text-amber-100">
+      <li>
+        <a [routerLink]="'/produtos'" class="hover:underline focus:text-black"
+          >Produtos</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="'/estoque'" class="hover:underline focus:text-black"
+          >Estoque</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="'/vendas'" class="hover:underline focus:text-black"
+          >Vendas</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="'/feiras'" class="hover:underline focus:text-black"
+          >Feiras</a
+        >
+      </li>
+    </ul>
+  </nav>
+  <div class="absolute top-1/2 right-4 -translate-y-1/2 transform">
+    <button
+      (click)="sair()"
+      class="rounded px-6 text-[14px] py-1 border-[1px] border-black text-black transition cursor-pointer hover:bg-amber-800 font-semibold"
+    >
+      SAIR
+    </button>
+  </div>
+</div>
+
+<!-- verificar loader abaixo -->
+<ng-container
+  *ngIf="!loading && feirasCarregadas && produtosCarregados; else loader"
+>
+  <div
+    class="bg-primary min-h-screen flex font-extralight flex-col justify-center items-center px-6 py-12 lg:px-8"
+  >
+    <div class="sm:mx-auto w-full max-w-4xl">
+      <h2 class="text-center text-2xl font-medium leading-9 text-gray-900">
+        {{ venda ? "Edição de venda" : "Cadastro de venda" }}
+      </h2>
+    </div>
+
+    <div class="mt-6 w-full max-w-4xl">
+      <form
+        class="space-y-6 p-6 rounded-lg w-full"
+        action="#"
+        method="POST"
+        [formGroup]="vendaForm"
+        (ngSubmit)="onSubmit()"
+      >
+        <div>
+          <label
+            for="localizacao"
+            class="block text-sm font-medium text-gray-700"
+            >Selecione a localização</label
+          >
+          <select
+            id="localizacao"
+            name="localizacao"
+            formControlName="feira_id"
+            class="mt-1 w-full rounded-md border h-10 border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+          >
+            <option *ngFor="let feira of feiras" [value]="feira.feira_id">
+              {{ feira.nome }}
+            </option>
+          </select>
+        </div>
+        <form [formGroup]="produtoForm">
+          <div class="mb-6">
+            <label for="produto" class="block text-sm font-medium text-gray-700"
+              >Selecione o produto</label
+            >
+            <select
+              id="produto"
+              name="produto"
+              formControlName="produto_id"
+              class="mt-1 w-full rounded-md border h-10 border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+            >
+              <option
+                *ngFor="let produto of produtos"
+                [value]="produto.produto_id"
+              >
+                {{ produto.nome }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="quantidade"
+              class="block text-sm font-medium text-gray-700"
+              >Quantidade</label
+            >
+            <input
+              type="number"
+              name="quantidade"
+              id="quantidade"
+              formControlName="quantidade"
+              class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+            />
+          </div>
+        </form>
+        <div>
+          <button
+            type="button"
+            [disabled]="produtoForm.invalid"
+            (click)="adicionarProduto()"
+            [ngClass]="{
+              'bg-gray-400 cursor-not-allowed': produtoForm.invalid,
+              'primary hover:bg-amber-500': produtoForm.valid
+            }"
+            class="flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-amber-600"
+          >
+            Adicionar produto
+          </button>
+        </div>
+        <div *ngIf="itensVenda.length" class="space-y-4 mt-6">
+          <h3 class="text-lg font-medium text-gray-900">Itens adicionados</h3>
+
+          <div
+            *ngFor="let item of itensVenda; let i = index"
+            class="flex items-center justify-between p-4 bg-white border border-gray-800 rounded-lg shadow-sm"
+          >
+            <div class="flex flex-col text-sm text-gray-800">
+              <span class="font-semibold text-base">{{
+                item.nome_produto
+              }}</span>
+              <span class="text-gray-500"
+                >Quantidade: {{ item.quantidade }}</span
+              >
+              <span class="text-gray-500"
+                >Preço unitário: R$ {{ item.preco_unitario }}</span
+              >
+              <span class="text-gray-700 font-medium"
+                >Subtotal: R$
+                {{
+                  item.quantidade * item.preco_unitario | number : "1.2-2"
+                }}</span
+              >
+            </div>
+            <div class="flex flex-col gap-2 text-sm font-medium">
+              <button
+                type="button"
+                (click)="editarProduto(item.produto_id)"
+                class="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                (click)="excluirProduto(item.produto_id)"
+                class="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded transition"
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="flex justify-end items-center gap-2 text-base text-gray-900 font-medium"
+          >
+            <span>Total: R${{ valorTotal | number : "1.2-2" }}</span>
+          </div>
+        </div>
+
+        <!-- Botão -->
+        <div>
+          <button
+            [disabled]="isDisabled"
+            type="submit"
+            [ngClass]="{
+              'bg-gray-400 cursor-not-allowed': isDisabled,
+              'primary hover:bg-amber-500': !isDisabled
+            }"
+            class="flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-s focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-amber-600"
+          >
+            Finalizar venda
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #loader>
+  <div
+    class="loader-container bg-primary flex justify-center items-center min-h-screen"
+  >
+    <div class="loader"></div>
+  </div>
+</ng-template>
