@@ -12,6 +12,7 @@ import { FeirasCreateComponent } from './components/feiras-create/feiras-create.
 import { EstoqueCreateComponent } from './components/estoque-create/estoque-create.component';
 import { AuthGuard } from './auth.guard';
 import { VendasCreateComponent } from './components/vendas-create/vendas-create.component';
+import { MoverEstoqueComponent } from './components/mover-estoque/mover-estoque.component';
 
 const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -36,6 +37,11 @@ const routes: Routes = [
   {
     path: 'estoque/create/:id',
     component: EstoqueCreateComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'estoque/mover-estoque/:id',
+    component: MoverEstoqueComponent,
     canActivate: [AuthGuard],
   },
   { path: 'feiras', component: FeirasComponent, canActivate: [AuthGuard] },

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Estoque, EstoqueService } from 'src/app/estoque.service';
+import { Estoque, EstoqueService, PostEstoque } from 'src/app/estoque.service';
 import { Feira, FeirasService } from 'src/app/feiras.service';
 import { Produto, ProdutosService } from 'src/app/produtos.service';
 
@@ -55,7 +55,8 @@ export class EstoqueCreateComponent implements OnInit {
   get isDisabled(): boolean {
     return (
       !this.estoqueForm.controls['produto_id'].value ||
-      !this.estoqueForm.controls['quantidade'].value ||
+      this.estoqueForm.controls['quantidade'].value  === null||
+      this.estoqueForm.controls['quantidade'].value  === undefined||
       !this.estoqueForm.controls['lote'].value ||
       !this.estoqueForm.controls['localizacao'].value
     );
@@ -99,16 +100,19 @@ export class EstoqueCreateComponent implements OnInit {
   }
 
   onSubmit(): void {
+    const feira = this.feiras.find(feira => feira.nome === this.estoqueForm.controls['localizacao'].value)
+
     if (this.estoque) {
-      const estoque: Estoque = {
+      const estoque: PostEstoque = {
         ...this.estoque,
         produto_id: this.estoqueForm.controls['produto_id'].value,
         quantidade: this.estoqueForm.controls['quantidade'].value,
         lote: this.estoqueForm.controls['lote'].value,
-        data_producao: new Date().toISOString().slice(0, 10),
-        data_validade: new Date().toISOString().slice(0, 10),
+        data_producao: this.estoqueForm.controls['data_producao'].value,
+        data_validade: this.estoqueForm.controls['data_validade'].value,
         localizacao: this.estoqueForm.controls['localizacao'].value,
         data_atualizacao: new Date().toISOString().slice(0, 10),
+        feira_id: feira?.feira_id as number,
       };
       this.estoqueService
         .editarEstoque(this.estoque?.estoque_id as number, estoque)
@@ -123,22 +127,23 @@ export class EstoqueCreateComponent implements OnInit {
           },
         });
     } else {
-      const estoque: Estoque = {
+      const estoque: PostEstoque = {
         produto_id: this.estoqueForm.controls['produto_id'].value,
         quantidade: this.estoqueForm.controls['quantidade'].value,
         lote: this.estoqueForm.controls['lote'].value,
-        data_producao: new Date().toISOString().slice(0, 10),
-        data_validade: new Date().toISOString().slice(0, 10),
+        data_producao: this.estoqueForm.controls['data_producao'].value,
+        data_validade: this.estoqueForm.controls['data_validade'].value,
         localizacao: this.estoqueForm.controls['localizacao'].value,
         data_atualizacao: new Date().toISOString().slice(0, 10),
+        feira_id: feira?.feira_id as number,
       };
       this.estoqueService.adicionarEstoque(estoque).subscribe({
         next: () => {
-          this.toastr.success('Estoque atualizado com sucesso!');
-          this.router.navigate(['/etoque']);
+          this.toastr.success('Estoque criado com sucesso!');
+          this.router.navigate(['/estoque']);
         },
         error: (err) => {
-          this.toastr.error('Erro ao atualizar estoque.');
+          this.toastr.error('Erro ao criasr estoque.');
           console.error(err);
         },
       });

@@ -11,8 +11,11 @@ import { Estoque, EstoqueService } from 'src/app/estoque.service';
 export class EstoqueComponent {
   estoques: Estoque[] = [];
   estoquesFiltrados: Estoque[] = [];
+  estoquesFiltradosSede: Estoque[] = [];
+  estoquesSede: Estoque[] = [];
   searchControl = new FormControl('');
   loading = false;
+  somenteSede = false;
 
   constructor(
     private estoquesService: EstoqueService,
@@ -35,6 +38,8 @@ export class EstoqueComponent {
       const reversed = res.reverse();
       this.estoques = reversed;
       this.estoquesFiltrados = reversed;
+      this.estoquesSede = reversed.filter(item => item.localizacao.toLowerCase() === 'sede');
+      this.estoquesFiltradosSede = reversed.filter(item => item.localizacao.toLowerCase() === 'sede');
     });
   }
 
@@ -46,12 +51,24 @@ export class EstoqueComponent {
     this.router.navigate([`/estoque/create`, id]);
   }
 
+  moverEstoque(id: number | undefined): void {
+    this.router.navigate([`/estoque/mover-estoque`, id]);
+  }
+
   filtrarProdutos(valor: string): void {
     const termo = valor.toLowerCase();
-    this.estoquesFiltrados =
+    if(this.somenteSede) {
+this.estoquesFiltradosSede =
+      this.estoquesSede.filter((estoque) =>
+        estoque.produto?.nome?.toLowerCase().includes(termo)
+      ) || [];
+    } else {
+ this.estoquesFiltrados =
       this.estoques.filter((estoque) =>
         estoque.produto?.nome?.toLowerCase().includes(termo)
       ) || [];
+    }
+
   }
 
   sair(): void {

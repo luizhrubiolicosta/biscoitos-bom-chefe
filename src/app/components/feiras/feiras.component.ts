@@ -50,11 +50,11 @@ export class FeirasComponent {
   excluirfeira(id: number | undefined): void {
     this.feirasService.excluirFeira(id).subscribe({
       next: () => {
-        this.toastr.success('feira atualizado com sucesso!');
+        this.toastr.success('feira excluída com sucesso!');
         this.carregarfeiras();
       },
       error: (err) => {
-        this.toastr.error('Erro ao atualizar feira.');
+        this.toastr.error('Erro ao excluir feira.');
         console.error(err);
       },
     });

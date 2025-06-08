@@ -7,9 +7,9 @@ export interface Produto {
   produto_id?: number;
   nome: string;
   descricao: string;
+  categoria?: string;
   preco_unitario: string;
   peso_gramas: number;
-  categoria?: string;
   data_criacao?: string;
   status?: boolean;
 }

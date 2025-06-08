@@ -71,8 +71,8 @@ export class VendasCreateComponent {
         feira_id: this.venda?.feira_id,
       });
       this.produtoForm.setValue({
-        produto_id: this.venda?.itens_venda[0].produto_id,
-        quantidade: this.venda?.itens_venda[0].quantidade,
+        produto_id: this.venda?.itens_venda[0]?.produto_id,
+        quantidade: this.venda?.itens_venda[0]?.quantidade,
       });
 
     });
@@ -185,7 +185,6 @@ export class VendasCreateComponent {
         itens_venda: this.itensVenda,
         feira_id: this.vendaForm.controls['feira_id'].value,
         status_venda: 'finalizada',
-        metodo_pagamento: 'dinheiro',
         valor_total: `R$${this.valorTotal}`,
         cliente_id: 0,
       };

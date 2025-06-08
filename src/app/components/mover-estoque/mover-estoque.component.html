@@ -45,13 +45,15 @@
 </div>
 
 <!-- verificar loader abaixo -->
-<ng-container *ngIf="!loading; else loader">
+<ng-container
+  *ngIf="!loading && feirasCarregadas; else loader"
+>
   <div
     class="bg-primary min-h-screen flex font-extralight flex-col justify-center items-center px-6 py-12 lg:px-8"
   >
     <div class="sm:mx-auto w-full max-w-4xl">
       <h2 class="text-center text-2xl font-medium leading-9 text-gray-900">
-        {{ feira ? "Edição de feira" : "Cadastro de feira" }}
+        Movimentação de estoque
       </h2>
     </div>
 
@@ -60,30 +62,43 @@
         class="space-y-6 p-6 rounded-lg w-full"
         action="#"
         method="POST"
-        [formGroup]="feiraForm"
+        [formGroup]="estoqueForm"
         (ngSubmit)="onSubmit()"
       >
-        <div>
-          <label for="nome" class="block text-sm font-medium text-gray-700"
-            >Nome da feira</label
-          >
-          <input
-            type="text"
-            name="nome"
-            id="nome"
-            formControlName="nome"
-            class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
-          />
+         <div class="flex flex-col gap-y-1">
+         <span class="block text-sm font-medium text-gray-700">Produto a mover:</span>
+         <span class="block font-medium text-lg">{{estoque?.produto?.nome}} - {{estoque?.quantidade}} unidades</span>
         </div>
         <div>
-          <label for="data" class="block text-sm font-medium text-gray-700"
-            >Data da feira (ex: 2025-06-29 Ano-mês-dia)</label
+          <label
+            for="feira_id"
+            class="block text-sm font-medium text-gray-700"
+            >Selecione a feira de destino</label
+          >
+          <select
+            id="feira_id"
+            name="feira_id"
+            formControlName="feira_id"
+            class="mt-1 w-full rounded-md border h-10 border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+          >
+            <option *ngFor="let feira of feiras" [value]="feira.feira_id">
+              {{ feira.nome }}
+            </option>
+          </select>
+        </div>
+
+
+        <div>
+          <label
+            for="quantidade"
+            class="block text-sm font-medium text-gray-700"
+            >Quantidade a mover do item</label
           >
           <input
-            type="text"
-            name="data"
-            id="data"
-            formControlName="data"
+            type="number"
+            name="quantidade"
+            id="quantidade"
+            formControlName="quantidade"
             class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
           />
         </div>

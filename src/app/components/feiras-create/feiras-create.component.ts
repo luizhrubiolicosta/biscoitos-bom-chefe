@@ -14,6 +14,7 @@ export class FeirasCreateComponent implements OnInit {
   feiraForm: FormGroup;
   loading = true;
   nome_feira_edit = '';
+  data_feira_edit = '';
 
   constructor(
     private feirasService: FeirasService,
@@ -24,6 +25,7 @@ export class FeirasCreateComponent implements OnInit {
   ) {
     this.feiraForm = this.fb.group({
       nome: ['', [Validators.required]],
+      data: ['', [Validators.required]],
     });
   }
 
@@ -40,8 +42,9 @@ export class FeirasCreateComponent implements OnInit {
 
   get isDisabled(): boolean {
     return (
-      this.nome_feira_edit === this.feiraForm.controls['nome'].value ||
-      !this.feiraForm.controls['nome'].value
+      (this.nome_feira_edit === this.feiraForm.controls['nome'].value ||
+      !this.feiraForm.controls['nome'].value )&&
+     (!this.feiraForm.controls['data'].value || this.feiraForm.controls['data'].value === this.data_feira_edit)
     );
   }
 
@@ -50,8 +53,10 @@ export class FeirasCreateComponent implements OnInit {
       this.feira = res.find((feira) => feira.feira_id === this.feira_id);
       this.feiraForm.setValue({
         nome: this.feira?.nome,
+        data: this.feira?.data
       });
       this.nome_feira_edit = this.feira?.nome as string;
+      this.data_feira_edit = this.feira?.data as string;
       this.loading = false;
     });
   }
@@ -61,6 +66,7 @@ export class FeirasCreateComponent implements OnInit {
       const feira: Feira = {
         ...this.feira,
         nome: this.feiraForm.controls['nome'].value,
+        data: this.feiraForm.controls['data'].value
       };
       this.feirasService
         .editarFeira(this.feira?.feira_id as number, feira)
@@ -77,6 +83,7 @@ export class FeirasCreateComponent implements OnInit {
     } else {
       const feira: Feira = {
         nome: this.feiraForm.controls['nome'].value,
+        data: this.feiraForm.controls['data'].value
       };
       this.feirasService.adicionarFeira(feira).subscribe({
         next: () => {

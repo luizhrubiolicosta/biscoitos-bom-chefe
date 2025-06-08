@@ -9,7 +9,7 @@ export interface Vendas {
   data_venda: string;
   venda_id?: number;
   feira_id: number;
-  data_atualizacao: string;
+  data_atualizacao?: string;
   status_venda?: string;
   metodo_pagamento?: string;
   valor_total?: string;
@@ -26,7 +26,6 @@ export interface PostVendas {
   itens_venda: ItensVendas[];
   feira_id: number;
   status_venda?: string;
-  metodo_pagamento?: string;
   valor_total?: string;
   cliente_id?: number;
 }
@@ -35,17 +34,17 @@ export interface PostVendas {
   providedIn: 'root',
 })
 export class VendasService {
-  mockedVenda: Vendas[] = [
-    {
-      venda_id: 1,
-      itens_venda: [{ quantidade: 1, produto_id: 1, preco_unitario: 1 }],
-      feira: { feira_id: 1, nome: 'Feira Gutierrez' },
-      data_venda: '2025/05/29',
-      feira_id: 1,
-      data_atualizacao: '2025/05/29',
-      valor_total: 'R$3,00',
-    },
-  ];
+  // mockedVenda: Vendas[] = [
+  //   {
+  //     venda_id: 1,
+  //     itens_venda: [{ quantidade: 1, produto_id: 1, preco_unitario: 1 }],
+  //     feira: { feira_id: 1, nome: 'Feira Gutierrez' },
+  //     data_venda: '2025/05/29',
+  //     feira_id: 1,
+  //     data_atualizacao: '2025/05/29',
+  //     valor_total: 'R$3,00',
+  //   },
+  // ];
 
   private API_URL = 'http://132.145.184.44:8000/vendas';
   API_TOKEN = 'AhuAk87&%&Ajha%ahga$2851S6hdma';
@@ -58,8 +57,7 @@ export class VendasService {
   constructor(private http: HttpClient) {}
 
   getVendas(): Observable<Vendas[]> {
-    // return this.http.get<Vendas[]>(this.API_URL, { headers: this.headers });
-    return of(this.mockedVenda);
+    return this.http.get<Vendas[]>(this.API_URL, { headers: this.headers });
   }
 
   adicionarVendas(Vendas: PostVendas): Observable<PostVendas> {

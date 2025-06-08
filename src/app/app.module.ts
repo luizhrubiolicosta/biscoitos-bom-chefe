@@ -24,6 +24,7 @@ import { VendasComponent } from './components/vendas/vendas.component';
 import { FeirasCreateComponent } from './components/feiras-create/feiras-create.component';
 import { EstoqueCreateComponent } from './components/estoque-create/estoque-create.component';
 import { VendasCreateComponent } from './components/vendas-create/vendas-create.component';
+import { MoverEstoqueComponent } from './components/mover-estoque/mover-estoque.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { VendasCreateComponent } from './components/vendas-create/vendas-create.
     FeirasCreateComponent,
     EstoqueCreateComponent,
     VendasCreateComponent,
+    MoverEstoqueComponent
   ],
   imports: [
     BrowserModule,

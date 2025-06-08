@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 export interface Feira {
   feira_id?: number;
   nome: string;
+  data: string;
 }
 
 @Injectable({

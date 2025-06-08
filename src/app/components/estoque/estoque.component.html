@@ -52,6 +52,10 @@
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h2 class="text-2xl font-medium text-gray-900">Lista de estoques</h2>
         <div class="flex flex-col sm:flex-row gap-2 items-center">
+          <button (click)="somenteSede = !somenteSede"
+           class="rounded-md bg-amber-600 text-white cursor-pointer px-4 py-2 text-sm font-medium hover:bg-amber-700 transition">
+  {{ somenteSede ? 'Mostrar todos estoques' : 'Mostrar somente estoque da sede' }}
+</button>
           <input
             [formControl]="searchControl"
             type="text"
@@ -84,7 +88,22 @@
               <th
                 class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider"
               >
+                Lote
+              </th>
+              <th
+                class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider"
+              >
                 Data de atualização
+              </th>
+              <th
+                class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider"
+              >
+                Data de produção
+              </th>
+              <th
+                class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider"
+              >
+                Data de validade
               </th>
               <th
                 class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider"
@@ -98,8 +117,8 @@
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100 text-gray-700">
-            <tr *ngFor="let estoque of estoquesFiltrados" class="transition">
+          <tbody *ngIf="somenteSede; else todosEstoques" class="divide-y divide-gray-100 text-gray-700">
+            <tr *ngFor="let estoque of estoquesFiltradosSede" class="transition">
               <td
                 class="px-6 py-4 text-sm whitespace-nowrap truncate max-w-[406px]"
               >
@@ -110,8 +129,19 @@
               >
                 {{ estoque.quantidade }}
               </td>
+              <td
+                class="px-6 py-4 text-sm whitespace-nowrap truncate max-w-[406px]"
+              >
+                {{ estoque.lote }}
+              </td>
               <td class="px-6 py-4 text-sm whitespace-nowrap">
-                {{ estoque.data_atualizacao }}
+                {{ estoque.data_atualizacao | date:'dd/MM/yyyy HH:mm:ss' }}
+              </td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap">
+                {{ estoque.data_producao | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap">
+                {{ estoque.data_validade | date:'dd/MM/yyyy' }}
               </td>
               <td class="px-6 py-4 text-sm whitespace-nowrap">
                 {{ estoque.localizacao }}
@@ -123,9 +153,66 @@
                 >
                   Atualizar
                 </button>
+                <button
+                *ngIf="estoque?.localizacao?.toLowerCase() === 'sede'"
+                [disabled]="!estoque?.quantidade"
+                  ngClass="{{!estoque?.quantidade ? 'rounded bg-gray-500 px-3 py-1 text-white cursor-not-allowed' : 'rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition' }}"
+                  (click)="moverEstoque(estoque.estoque_id)"
+                >
+                  Mover estoque
+                </button>
               </td>
             </tr>
           </tbody>
+
+
+          <ng-template #todosEstoques>
+            <tr *ngFor="let estoque of estoquesFiltrados" class="transition">
+              <td
+                class="px-6 py-4 text-sm whitespace-nowrap truncate max-w-[406px]"
+              >
+                {{ estoque?.produto?.nome }}
+              </td>
+              <td
+                class="px-6 py-4 text-sm whitespace-nowrap truncate max-w-[406px]"
+              >
+                {{ estoque.quantidade }}
+              </td>
+              <td
+                class="px-6 py-4 text-sm whitespace-nowrap truncate max-w-[406px]"
+              >
+                {{ estoque.lote }}
+              </td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap">
+                {{ estoque.data_atualizacao | date:'dd/MM/yyyy HH:mm:ss' }}
+              </td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap">
+                {{ estoque.data_producao | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap">
+                {{ estoque.data_validade | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap">
+                {{ estoque.localizacao }}
+              </td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap space-x-2">
+                <button
+                  (click)="atualizarEstoque(estoque.estoque_id)"
+                  class="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition"
+                >
+                  Atualizar
+                </button>
+                <button
+                *ngIf="estoque?.localizacao?.toLowerCase() === 'sede'"
+                [disabled]="!estoque?.quantidade"
+                ngClass="{{!estoque?.quantidade ? 'rounded bg-gray-500 px-3 py-1 text-white cursor-not-allowed' : 'rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition' }}"
+                  (click)="moverEstoque(estoque.estoque_id)"
+                >
+                  Mover estoque
+                </button>
+              </td>
+            </tr>
+          </ng-template>
         </table>
       </div>
     </div>
