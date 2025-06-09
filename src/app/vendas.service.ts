@@ -46,7 +46,7 @@ export class VendasService {
   //   },
   // ];
 
-  private API_URL = 'http://132.145.184.44:8000/vendas';
+  private API_URL = '/api/vendas/';
   API_TOKEN = 'AhuAk87&%&Ajha%ahga$2851S6hdma';
   headers = new HttpHeaders({
     accept: 'application/json',
