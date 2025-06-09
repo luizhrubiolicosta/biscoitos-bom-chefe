@@ -82,7 +82,7 @@ export class EstoqueService {
   }
 
     moverEstoque(estoque: MovimentarEstoque): Observable<MovimentarEstoque> {
-    return this.http.post<MovimentarEstoque>(`${this.API_URL}/movimentar-para-feira`, estoque, {
+    return this.http.post<MovimentarEstoque>(`${this.API_URL}/movimentar-para-feira/`, estoque, {
       headers: this.headers,
     });
   }

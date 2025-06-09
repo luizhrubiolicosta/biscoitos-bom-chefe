@@ -172,8 +172,9 @@ export class VendasCreateComponent {
         .editarVendas(this.venda?.venda_id as number, venda)
         .subscribe({
           next: () => {
+
             this.toastr.success('Venda atualizada com sucesso!');
-            this.router.navigate(['/estoque']);
+            this.router.navigate(['/vendas']);
           },
           error: (err) => {
             this.toastr.error('Erro ao atualizar venda.');
@@ -190,11 +191,15 @@ export class VendasCreateComponent {
       };
       this.vendaService.adicionarVendas(venda).subscribe({
         next: () => {
-          this.toastr.success('Venda atualizada com sucesso!');
-          this.router.navigate(['/etoque']);
+              const feira = this.feiras.find(item => item.feira_id === venda.feira_id)?.nome?.toLowerCase() !== 'sede'
+          if(feira) {
+           this.vendaService.consolidarVendas(venda.feira_id).subscribe()
+          }
+          this.toastr.success('Venda efetuada com sucesso!');
+          this.router.navigate(['/vendas']);
         },
         error: (err) => {
-          this.toastr.error('Erro ao atualizar venda.');
+          this.toastr.error('Erro ao efetuar venda.');
           console.error(err);
         },
       });

@@ -66,6 +66,12 @@ export class VendasService {
     });
   }
 
+  consolidarVendas(feira_id: number): Observable<PostVendas> {
+    return this.http.post<PostVendas>(`${this.API_URL}/consolidar/`, feira_id, {
+      headers: this.headers,
+    });
+  }
+
   editarVendas(Vendas_id: number, Vendas: PostVendas): Observable<PostVendas> {
     const url = `${this.API_URL}/${Vendas_id}`;
 

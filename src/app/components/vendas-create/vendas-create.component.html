@@ -101,30 +101,15 @@
               </option>
             </select>
           </div>
-
-          <div>
-            <label
-              for="quantidade"
-              class="block text-sm font-medium text-gray-700"
-              >Quantidade</label
-            >
-            <input
-              type="number"
-              name="quantidade"
-              id="quantidade"
-              formControlName="quantidade"
-              class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
-            />
-          </div>
         </form>
         <div>
           <button
             type="button"
-            [disabled]="produtoForm.invalid"
+            [disabled]="!produtoForm.controls['produto_id'].value"
             (click)="adicionarProduto()"
             [ngClass]="{
-              'bg-gray-400 cursor-not-allowed': produtoForm.invalid,
-              'primary hover:bg-amber-500': produtoForm.valid
+              'bg-gray-400 cursor-not-allowed': !produtoForm.controls['produto_id'].value,
+              'primary hover:bg-amber-500': !!produtoForm.controls['produto_id'].value
             }"
             class="flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-amber-600"
           >
@@ -142,9 +127,14 @@
               <span class="font-semibold text-base">{{
                 item.nome_produto
               }}</span>
-              <span class="text-gray-500"
-                >Quantidade: {{ item.quantidade }}</span
-              >
+
+              <!-- <input
+              type="number"
+              name="quantidade"
+              id="quantidade"
+              formControlName="quantidade"
+              class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+            /> -->
               <span class="text-gray-500"
                 >Preço unitário: R$ {{ item.preco_unitario }}</span
               >

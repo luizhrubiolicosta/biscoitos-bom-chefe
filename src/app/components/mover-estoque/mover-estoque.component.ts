@@ -77,8 +77,8 @@ export class MoverEstoqueComponent implements OnInit {
   onSubmit(): void {
       const estoque: MovimentarEstoque = {
         produto_id: this.estoque?.produto?.produto_id as number,
-        quantidade_a_mover: this.estoqueForm.controls['quantidade'].value,
-        feira_id_destino: this.estoqueForm.controls['lote'].value,
+        quantidade_a_mover: +this.estoqueForm.controls['quantidade'].value,
+        feira_id_destino: +this.estoqueForm.controls['feira_id'].value,
       };
 
       this.estoqueService
