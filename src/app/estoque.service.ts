@@ -61,7 +61,7 @@ export interface MovimentarEstoque {
   providedIn: 'root',
 })
 export class EstoqueService {
-  private API_URL = 'http://132.145.184.44:8000/estoques';
+  private API_URL = '/api/estoques/';
   API_TOKEN = 'AhuAk87&%&Ajha%ahga$2851S6hdma';
   headers = new HttpHeaders({
     accept: 'application/json',

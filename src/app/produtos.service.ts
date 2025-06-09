@@ -18,7 +18,7 @@ export interface Produto {
   providedIn: 'root',
 })
 export class ProdutosService {
-  private API_URL = 'http://132.145.184.44:8000/produtos';
+  private API_URL = '/api/produtos/';
      API_TOKEN = 'AhuAk87&%&Ajha%ahga$2851S6hdma'
        headers = new HttpHeaders({
         'accept': 'application/json',
