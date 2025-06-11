@@ -43,8 +43,6 @@
     </button>
   </div>
 </div>
-
-<!-- verificar loader abaixo -->
 <ng-container
   *ngIf="!loading && feirasCarregadas && produtosCarregados; else loader"
 >
@@ -59,11 +57,9 @@
 
     <div class="mt-6 w-full max-w-4xl">
       <form
-        class="space-y-6 p-6 rounded-lg w-full"
-        action="#"
-        method="POST"
         [formGroup]="vendaForm"
         (ngSubmit)="onSubmit()"
+        class="space-y-6 p-6 rounded-lg w-full"
       >
         <div>
           <label
@@ -82,41 +78,47 @@
             </option>
           </select>
         </div>
-        <form [formGroup]="produtoForm">
-          <div class="mb-6">
-            <label for="produto" class="block text-sm font-medium text-gray-700"
-              >Selecione o produto</label
+
+        <!-- Produto Form -->
+        <div [formGroup]="produtoForm" class="mb-6">
+          <label for="produto" class="block text-sm font-medium text-gray-700"
+            >Selecione o produto</label
+          >
+          <select
+            id="produto"
+            formControlName="produto_id"
+            class="mt-1 w-full rounded-md border h-10 border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+          >
+            <option
+              *ngFor="let produto of produtos"
+              [value]="produto.produto_id"
             >
-            <select
-              id="produto"
-              name="produto"
-              formControlName="produto_id"
-              class="mt-1 w-full rounded-md border h-10 border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
-            >
-              <option
-                *ngFor="let produto of produtos"
-                [value]="produto.produto_id"
-              >
-                {{ produto.nome }}
-              </option>
-            </select>
-          </div>
-        </form>
+              {{ produto.nome }}
+            </option>
+          </select>
+        </div>
+
         <div>
           <button
             type="button"
-            [disabled]="!produtoForm.controls['produto_id'].value"
             (click)="adicionarProduto()"
+            [disabled]="!produtoForm.valid"
             [ngClass]="{
-              'bg-gray-400 cursor-not-allowed': !produtoForm.controls['produto_id'].value,
-              'primary hover:bg-amber-500': !!produtoForm.controls['produto_id'].value
+              'bg-gray-400 cursor-not-allowed': !produtoForm.valid,
+              'primary hover:bg-amber-500': produtoForm.valid
             }"
             class="flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-amber-600"
           >
             Adicionar produto
           </button>
         </div>
-        <div *ngIf="itensVenda.length" class="space-y-4 mt-6">
+
+        <!-- Itens Venda com FormArray -->
+        <div
+          formArrayName="quantidade"
+          *ngIf="itensVenda.length"
+          class="space-y-4 mt-6"
+        >
           <h3 class="text-lg font-medium text-gray-900">Itens adicionados</h3>
 
           <div
@@ -127,14 +129,13 @@
               <span class="font-semibold text-base">{{
                 item.nome_produto
               }}</span>
-
-              <!-- <input
-              type="number"
-              name="quantidade"
-              id="quantidade"
-              formControlName="quantidade"
-              class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
-            /> -->
+              <input
+                type="number"
+                min="1"
+                [formControlName]="i"
+                (input)="atualizarQuantidade(i)"
+                class="mt-1 w-full rounded-md border border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
+              />
               <span class="text-gray-500"
                 >Preço unitário: R$ {{ item.preco_unitario }}</span
               >
@@ -145,14 +146,8 @@
                 }}</span
               >
             </div>
+
             <div class="flex flex-col gap-2 text-sm font-medium">
-              <button
-                type="button"
-                (click)="editarProduto(item.produto_id)"
-                class="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition"
-              >
-                Editar
-              </button>
               <button
                 type="button"
                 (click)="excluirProduto(item.produto_id)"
@@ -170,7 +165,6 @@
           </div>
         </div>
 
-        <!-- Botão -->
         <div>
           <button
             [disabled]="isDisabled"

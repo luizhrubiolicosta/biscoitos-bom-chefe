@@ -1,7 +1,10 @@
+// VendasCreateComponent atualizado para funcionar corretamente com múltiplos produtos
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { forkJoin, map } from 'rxjs';
+import { EstoqueService } from 'src/app/estoque.service';
 import { Feira, FeirasService } from 'src/app/feiras.service';
 import { Produto, ProdutosService } from 'src/app/produtos.service';
 import {
@@ -15,23 +18,23 @@ import {
   selector: 'app-vendas-create',
   templateUrl: './vendas-create.component.html',
 })
-export class VendasCreateComponent {
+export class VendasCreateComponent implements OnInit {
   venda?: Vendas;
   produtos: Produto[] = [];
   feiras: Feira[] = [];
   venda_id?: number;
   vendaForm: FormGroup;
   produtoForm: FormGroup;
-  vendaPost?: PostVendas;
   itensVenda: ItensVendas[] = [];
   loading = true;
   feirasCarregadas = false;
   produtosCarregados = false;
-  valorTotal: number = 0;
+  valorTotal = 0;
 
   constructor(
     private vendaService: VendasService,
     private produtosService: ProdutosService,
+    private estoqueService: EstoqueService,
     private feirasService: FeirasService,
     private route: ActivatedRoute,
     private router: Router,
@@ -40,10 +43,10 @@ export class VendasCreateComponent {
   ) {
     this.vendaForm = this.fb.group({
       feira_id: [null, Validators.required],
+      quantidade: this.fb.array([]),
     });
     this.produtoForm = this.fb.group({
       produto_id: [null, Validators.required],
-      quantidade: [null, Validators.required],
     });
   }
 
@@ -60,6 +63,10 @@ export class VendasCreateComponent {
     });
   }
 
+  get quantidadeFormArray(): FormArray {
+    return this.vendaForm.get('quantidade') as FormArray;
+  }
+
   get isDisabled(): boolean {
     return this.vendaForm.invalid || !this.itensVenda.length;
   }
@@ -67,144 +74,158 @@ export class VendasCreateComponent {
   carregarVendas(): void {
     this.vendaService.getVendas().subscribe((res) => {
       this.venda = res.find((venda) => venda.venda_id === this.venda_id);
-      this.vendaForm.setValue({
-        feira_id: this.venda?.feira_id,
-      });
-      this.produtoForm.setValue({
-        produto_id: this.venda?.itens_venda[0]?.produto_id,
-        quantidade: this.venda?.itens_venda[0]?.quantidade,
-      });
-
+      this.vendaForm.patchValue({ feira_id: this.venda?.feira_id });
+      this.loading = false
+      if (this.venda?.itens_venda?.length) {
+        this.itensVenda = this.venda.itens_venda.map((item) => {
+          const produto = this.produtos.find(
+            (p) => p.produto_id === item.produto_id
+          );
+          this.quantidadeFormArray.push(this.fb.control(item.quantidade));
+          return {
+            produto_id: item.produto_id,
+            nome_produto: produto?.nome ?? '',
+            preco_unitario: item.preco_unitario,
+            quantidade: item.quantidade,
+          };
+        });
+        this.atualizarValorTotal();
+      }
     });
   }
 
   carregarProdutos(): void {
     this.produtosService.getProdutos().subscribe((res) => {
-      const reversed = res.reverse();
-      this.produtos = reversed;
-      if (this.produtos.length) {
-        this.produtosCarregados = true;
-        if(this.venda?.venda_id) {
-          this.itensVenda = this.venda?.itens_venda?.map(item => ({nome_produto :this.produtos.find(p => p.produto_id == item.produto_id)?.nome, quantidade:item.quantidade, produto_id: item.produto_id, preco_unitario: item.preco_unitario})) || [];
-          this.loading = false;
-          this.valorTotal = 0;
-          this.itensVenda.forEach((item) => {
-          this.valorTotal += item.preco_unitario * item.quantidade;
-          });
-        }
-      }
+      this.produtos = res.reverse();
+      this.produtosCarregados = true;
     });
   }
 
   carregarfeiras(): void {
     this.feirasService.getFeiras().subscribe((res) => {
-      const reversed = res.reverse();
-      this.feiras = reversed;
-      if (this.feiras.length) {
-        this.feirasCarregadas = true;
-      }
+      this.feiras = res.reverse();
+      this.feirasCarregadas = true;
     });
   }
 
   adicionarProduto(): void {
-    const produtoIdControl = this.produtoForm.controls['produto_id'].value;
-    const produtoQuantidadeControl =
-      this.produtoForm.controls['quantidade'].value;
-    const item = this.itensVenda.find(
-      (item) => item.produto_id === produtoIdControl
-    );
-    const produto = this.produtos.find(
-      (prod) => prod.produto_id == produtoIdControl
-    );
-    if (item) {
-      this.itensVenda = this.itensVenda.map((itemm) =>
-        itemm.produto_id === produtoIdControl
-          ? {
-              ...itemm,
-              quantidade: produtoQuantidadeControl,
-            }
-          : itemm
-      );
-    } else {
-      this.itensVenda.push({
-        produto_id: produtoIdControl,
-        quantidade: produtoQuantidadeControl,
-        preco_unitario: +(produto?.preco_unitario as string),
-        nome_produto: produto?.nome,
-      });
+    const produtoId = +this.produtoForm.controls['produto_id'].value;
+
+    const exists = this.itensVenda.find((i) => i.produto_id === produtoId);
+    if (exists) {
+      this.toastr.warning('Produto já adicionado!');
+      return;
     }
-    this.valorTotal = 0;
-    this.itensVenda.forEach((item) => {
-      this.valorTotal += item.preco_unitario * item.quantidade;
+
+    const prod = this.produtos.find((p) => p.produto_id === produtoId);
+    if (!prod) {
+      this.toastr.error('Produto inválido.');
+      return;
+    }
+
+    this.itensVenda.push({
+      produto_id: prod.produto_id as number,
+      nome_produto: prod.nome,
+      preco_unitario: +prod.preco_unitario,
+      quantidade: 1,
     });
+
+    const quantidadeArray = this.vendaForm.get('quantidade') as FormArray;
+    quantidadeArray.push(this.fb.control(1, Validators.required));
+    this.atualizarValorTotal();
+    this.produtoForm.reset();
+
+    console.log('Produto adicionado com sucesso:', this.itensVenda);
   }
 
   editarProduto(id: number): void {
-    const produto = this.itensVenda.find(
-      (item) => item.produto_id.toString() == id.toString()
-    );
-
-    this.produtoForm.setValue({
-      produto_id: produto?.produto_id,
-      quantidade: produto?.quantidade,
-    });
+    const index = this.itensVenda.findIndex((item) => item.produto_id === id);
+    const item = this.itensVenda[index];
+    this.produtoForm.setValue({ produto_id: item.produto_id });
   }
 
   excluirProduto(id: number): void {
-    this.itensVenda = this.itensVenda.filter(
-      (item) => item.produto_id.toString() !== id.toString()
+    const index = this.itensVenda.findIndex((item) => item.produto_id === id);
+    if (index >= 0) {
+      this.itensVenda.splice(index, 1);
+      this.quantidadeFormArray.removeAt(index);
+    }
+    this.atualizarValorTotal();
+  }
+
+  atualizarQuantidade(index: number): void {
+    const novaQuantidade = this.quantidadeFormArray.at(index).value;
+    this.itensVenda[index].quantidade = novaQuantidade;
+    this.atualizarValorTotal();
+  }
+
+  atualizarValorTotal(): void {
+    this.valorTotal = this.itensVenda.reduce(
+      (total, item) => total + item.quantidade * item.preco_unitario,
+      0
     );
-    this.valorTotal = 0;
-    this.itensVenda.forEach((item) => {
-      this.valorTotal += item.preco_unitario * item.quantidade;
-    });
   }
 
   onSubmit(): void {
-    if (this.venda) {
-      const venda: PostVendas = {
-        ...this.venda,
-        itens_venda: this.itensVenda,
-        feira_id: this.vendaForm.controls['feira_id'].value,
-        valor_total: `R$${this.valorTotal}`,
-      };
-      this.vendaService
-        .editarVendas(this.venda?.venda_id as number, venda)
-        .subscribe({
-          next: () => {
+  const feiraId = this.vendaForm.controls['feira_id'].value;
+const feir =
+              this.feiras
+                .find((item) => item.feira_id === +feiraId)
 
-            this.toastr.success('Venda atualizada com sucesso!');
-            this.router.navigate(['/vendas']);
-          },
-          error: (err) => {
-            this.toastr.error('Erro ao atualizar venda.');
-            console.error(err);
-          },
-        });
-    } else {
+  const estoqueRequests = this.itensVenda.map(item =>
+    this.estoqueService.getProdutosEstoques(item.produto_id).pipe(
+      map(result => result.find(i => i.localizacao.toLowerCase() === feir?.nome.toLowerCase())?.estoque_id)
+    )
+  );
+
+  forkJoin(estoqueRequests).subscribe({
+    next: (estoqueIds: (number | undefined)[]) => {
       const venda: PostVendas = {
-        itens_venda: this.itensVenda,
-        feira_id: this.vendaForm.controls['feira_id'].value,
-        status_venda: 'finalizada',
-        valor_total: `R$${this.valorTotal}`,
-        cliente_id: 0,
+        itens_venda: this.itensVenda.map((item, index) => ({
+          estoque_id: estoqueIds[index] as number,
+          quantidade: item.quantidade,
+          preco_unitario: item.preco_unitario
+        })),
+        feira_id: feiraId,
+        status_venda: this.venda ? this.venda.status_venda : 'finalizada',
+        valor_total: this.valorTotal,
+        cliente_id: null ,
       };
-      this.vendaService.adicionarVendas(venda).subscribe({
-        next: () => {
-              const feira = this.feiras.find(item => item.feira_id === venda.feira_id)?.nome?.toLowerCase() !== 'sede'
-          if(feira) {
-           this.vendaService.consolidarVendas(venda.feira_id).subscribe()
+
+      const request = this.venda
+        ? this.vendaService.editarVendas(this.venda.venda_id!, venda)
+        : this.vendaService.adicionarVendas(venda);
+
+      request.subscribe({
+        next: (vend) => {
+          if (!this.venda) {
+            const feira =
+              this.feiras
+                .find((item) => item.feira_id === venda.feira_id)
+                ?.nome?.toLowerCase() !== 'sede';
+            if (feira) {
+              this.vendaService.consolidarVendas(vend.venda_id as number).subscribe();
+            }
           }
-          this.toastr.success('Venda efetuada com sucesso!');
+          this.toastr.success(
+            this.venda
+              ? 'Venda atualizada com sucesso!'
+              : 'Venda efetuada com sucesso!'
+          );
           this.router.navigate(['/vendas']);
         },
         error: (err) => {
-          this.toastr.error('Erro ao efetuar venda.');
+          this.toastr.error('Erro ao salvar venda.');
           console.error(err);
         },
       });
+    },
+    error: (err) => {
+      this.toastr.error('Erro ao buscar estoques.');
+      console.error(err);
     }
-  }
+  });
+}
 
   sair(): void {
     localStorage.removeItem('jwt');

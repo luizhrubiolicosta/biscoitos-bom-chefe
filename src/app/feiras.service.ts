@@ -13,6 +13,7 @@ export interface Feira {
 })
 export class FeirasService {
   private API_URL = '/api/feiras/';
+  // private readonly API_URL = 'http://132.145.184.44/api/feiras/';
   API_TOKEN = 'AhuAk87&%&Ajha%ahga$2851S6hdma';
   headers = new HttpHeaders({
     accept: 'application/json',

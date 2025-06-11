@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Feira } from './feiras.service';
 
 export interface Vendas {
@@ -15,6 +15,7 @@ export interface Vendas {
   valor_total?: string;
   cliente_id?: number;
 }
+
 export interface ItensVendas {
   quantidade: number;
   produto_id: number;
@@ -22,63 +23,67 @@ export interface ItensVendas {
   nome_produto?: string;
 }
 
+export interface PostItensVendas {
+  quantidade: number;
+  preco_unitario: number;
+  estoque_id: number;
+}
+
 export interface PostVendas {
-  itens_venda: ItensVendas[];
+  venda_id?: number
+  itens_venda: PostItensVendas[];
   feira_id: number;
   status_venda?: string;
-  valor_total?: string;
-  cliente_id?: number;
+  valor_total?: number;
+  cliente_id?: number | null;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class VendasService {
-  // mockedVenda: Vendas[] = [
-  //   {
-  //     venda_id: 1,
-  //     itens_venda: [{ quantidade: 1, produto_id: 1, preco_unitario: 1 }],
-  //     feira: { feira_id: 1, nome: 'Feira Gutierrez' },
-  //     data_venda: '2025/05/29',
-  //     feira_id: 1,
-  //     data_atualizacao: '2025/05/29',
-  //     valor_total: 'R$3,00',
-  //   },
-  // ];
+  // private readonly API_URL = 'http://132.145.184.44/api/vendas/';
+    private API_URL = '/api/vendas/';
+  private readonly API_TOKEN = 'AhuAk87&%&Ajha%ahga$2851S6hdma';
 
-  private API_URL = '/api/vendas/';
-  API_TOKEN = 'AhuAk87&%&Ajha%ahga$2851S6hdma';
-  headers = new HttpHeaders({
-    accept: 'application/json',
-    'Content-Type': 'application/json',
+  private readonly baseHeaders = new HttpHeaders({
     'x-token': this.API_TOKEN,
   });
 
   constructor(private http: HttpClient) {}
 
   getVendas(): Observable<Vendas[]> {
-    return this.http.get<Vendas[]>(this.API_URL, { headers: this.headers });
-  }
-
-  adicionarVendas(Vendas: PostVendas): Observable<PostVendas> {
-    return this.http.post<PostVendas>(this.API_URL, Vendas, {
-      headers: this.headers,
+    return this.http.get<Vendas[]>(this.API_URL, {
+      headers: this.baseHeaders,
     });
   }
 
-  consolidarVendas(feira_id: number): Observable<PostVendas> {
-    return this.http.post<PostVendas>(`${this.API_URL}/consolidar/`, feira_id, {
-      headers: this.headers,
+  adicionarVendas(vendas: PostVendas): Observable<PostVendas> {
+    const headers = this.baseHeaders.set('Content-Type', 'application/json');
+    return this.http.post<PostVendas>(this.API_URL, vendas, {
+      headers,
     });
   }
 
-  editarVendas(Vendas_id: number, Vendas: PostVendas): Observable<PostVendas> {
-    const url = `${this.API_URL}/${Vendas_id}`;
+  consolidarVendas(venda_id: number): Observable<PostVendas> {
+    const headers = this.baseHeaders.set('Content-Type', 'application/json');
+    return this.http.post<PostVendas>(`${this.API_URL}/consolidar/`, {venda_id}, {
+      headers,
+    });
+  }
 
-    return this.http.put<PostVendas>(url, Vendas, { headers: this.headers });
+  editarVendas(vendas_id: number, vendas: PostVendas): Observable<PostVendas> {
+    const url = `${this.API_URL}/${vendas_id}`;
+    const headers = this.baseHeaders.set('Content-Type', 'application/json');
+    return this.http.put<PostVendas>(url, vendas, {
+      headers,
+    });
   }
 
   excluirVendas(id: number | undefined): Observable<any> {
-    return this.http.delete(`${this.API_URL}/${id}`, { headers: this.headers });
+    const url = `${this.API_URL}/${id}`;
+    return this.http.delete(url, {
+      headers: this.baseHeaders,
+    });
   }
 }
