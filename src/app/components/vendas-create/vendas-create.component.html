@@ -84,6 +84,7 @@
           <label for="produto" class="block text-sm font-medium text-gray-700"
             >Selecione o produto</label
           >
+
           <select
             id="produto"
             formControlName="produto_id"
@@ -92,6 +93,7 @@
             <option
               *ngFor="let produto of produtos"
               [value]="produto.produto_id"
+              [disabled]="!vendaForm.controls['feira_id'].value"
             >
               {{ produto.nome }}
             </option>

@@ -52,14 +52,17 @@ export class VendasCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
-      if (!!params['id']) {
+      this.carregarProdutos();
+      this.carregarfeiras();
+      setTimeout(() => {
+         if (!!params['id']) {
         this.venda_id = +params['id'];
         this.carregarVendas();
       } else {
         this.loading = false;
       }
-      this.carregarProdutos();
-      this.carregarfeiras();
+      }, 500);
+
     });
   }
 
@@ -79,7 +82,7 @@ export class VendasCreateComponent implements OnInit {
       if (this.venda?.itens_venda?.length) {
         this.itensVenda = this.venda.itens_venda.map((item) => {
           const produto = this.produtos.find(
-            (p) => p.produto_id === item.produto_id
+            (p) => p.produto_id === (item.item_de_estoque_utilizado?.produto?.produto_id as number)
           );
           this.quantidadeFormArray.push(this.fb.control(item.quantidade));
           return {

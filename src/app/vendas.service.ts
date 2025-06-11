@@ -21,6 +21,13 @@ export interface ItensVendas {
   produto_id: number;
   preco_unitario: number;
   nome_produto?: string;
+  item_de_estoque_utilizado?: {
+          estoque_id: number,
+          produto: {
+            produto_id: number,
+            nome: string
+          }
+}
 }
 
 export interface PostItensVendas {
