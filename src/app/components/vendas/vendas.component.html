@@ -105,15 +105,9 @@
                 {{ venda.feira.nome }}
               </td>
               <td class="px-6 py-4 text-sm whitespace-nowrap">
-                {{ venda.data_venda }}
+                {{ venda.data_venda | date:'dd/MM/yyyy'}}
               </td>
               <td class="px-6 py-4 text-sm whitespace-nowrap space-x-2">
-                <button
-                  (click)="editarVenda(venda.venda_id)"
-                  class="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition"
-                >
-                  Editar
-                </button>
                 <button
                   (click)="excluirVenda(venda.venda_id)"
                   class="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600 transition"

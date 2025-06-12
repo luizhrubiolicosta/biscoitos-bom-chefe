@@ -46,14 +46,14 @@
 
 <!-- verificar loader abaixo -->
 <ng-container
-  *ngIf="!loading && feirasCarregadas && produtosCarregados; else loader"
+  *ngIf="!loading && produtosCarregados; else loader"
 >
   <div
     class="bg-primary min-h-screen flex font-extralight flex-col justify-center items-center px-6 py-12 lg:px-8"
   >
     <div class="sm:mx-auto w-full max-w-4xl">
       <h2 class="text-center text-2xl font-medium leading-9 text-gray-900">
-        {{ estoque ? "Edição de estoque" : "Cadastro de estoque" }}
+        {{ estoque ? "Edição de estoque da Sede" : "Cadastro de estoque da Sede" }}
       </h2>
     </div>
 
@@ -65,23 +65,6 @@
         [formGroup]="estoqueForm"
         (ngSubmit)="onSubmit()"
       >
-        <div>
-          <label
-            for="localizacao"
-            class="block text-sm font-medium text-gray-700"
-            >Selecione a localização</label
-          >
-          <select
-            id="localizacao"
-            name="localizacao"
-            formControlName="localizacao"
-            class="mt-1 w-full rounded-md border h-10 border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
-          >
-            <option *ngFor="let feira of feiras" [value]="feira.nome">
-              {{ feira.nome }}
-            </option>
-          </select>
-        </div>
         <div>
           <label for="produto" class="block text-sm font-medium text-gray-700"
             >Selecione o produto</label

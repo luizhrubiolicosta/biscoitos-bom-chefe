@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 export interface Produto {
   produto_id?: number;
+  estoque_id?: number;
   nome: string;
   descricao: string;
   categoria?: string;
@@ -32,6 +33,19 @@ export class ProdutosService {
       headers: this.headers,
     });
   }
+
+  getProdutosPorFeira(feiraId: number, skip = 0, limit = 100): Observable<Produto[]> {
+  const params = {
+    skip: skip.toString(),
+    limit: limit.toString(),
+    feira_id: feiraId.toString(),
+  };
+
+  return this.http.get<Produto[]>(this.API_URL, {
+    headers: this.headers,
+    params,
+  });
+}
 
   adicionarProduto(produto: Produto): Observable<Produto> {
     const postHeaders = this.headers.set('Content-Type', 'application/json');

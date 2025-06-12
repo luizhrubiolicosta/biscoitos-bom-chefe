@@ -28,7 +28,6 @@ export class VendasCreateComponent implements OnInit {
   itensVenda: ItensVendas[] = [];
   loading = true;
   feirasCarregadas = false;
-  produtosCarregados = false;
   valorTotal = 0;
 
   constructor(
@@ -52,7 +51,6 @@ export class VendasCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
-      this.carregarProdutos();
       this.carregarfeiras();
       setTimeout(() => {
          if (!!params['id']) {
@@ -62,8 +60,17 @@ export class VendasCreateComponent implements OnInit {
         this.loading = false;
       }
       }, 500);
-
     });
+
+    this.vendaForm.controls['feira_id'].valueChanges.subscribe(item => {
+      if(item){
+        this.produtos = []
+        this.produtoForm.reset()
+        this.itensVenda = []
+        this.valorTotal = 0
+        this.carregarProdutosPorFeira()
+      }
+    })
   }
 
   get quantidadeFormArray(): FormArray {
@@ -86,7 +93,7 @@ export class VendasCreateComponent implements OnInit {
           );
           this.quantidadeFormArray.push(this.fb.control(item.quantidade));
           return {
-            produto_id: item.produto_id,
+            produto_id: produto?.produto_id as number,
             nome_produto: produto?.nome ?? '',
             preco_unitario: item.preco_unitario,
             quantidade: item.quantidade,
@@ -97,10 +104,9 @@ export class VendasCreateComponent implements OnInit {
     });
   }
 
-  carregarProdutos(): void {
-    this.produtosService.getProdutos().subscribe((res) => {
+  carregarProdutosPorFeira(): void {
+    this.produtosService.getProdutosPorFeira(this.vendaForm.controls['feira_id'].value).subscribe((res) => {
       this.produtos = res.reverse();
-      this.produtosCarregados = true;
     });
   }
 
@@ -170,24 +176,26 @@ export class VendasCreateComponent implements OnInit {
   }
 
   onSubmit(): void {
-  const feiraId = this.vendaForm.controls['feira_id'].value;
+      const feiraId = this.vendaForm.controls['feira_id'].value;
 const feir =
               this.feiras
                 .find((item) => item.feira_id === +feiraId)
 
+
   const estoqueRequests = this.itensVenda.map(item =>
     this.estoqueService.getProdutosEstoques(item.produto_id).pipe(
-      map(result => result.find(i => i.localizacao.toLowerCase() === feir?.nome.toLowerCase())?.estoque_id)
+      map(result => result.find(i => i.localizacao.toLowerCase() === feir?.nome.toLowerCase() && i.quantidade > 0)?.estoque_id)
     )
   );
 
   forkJoin(estoqueRequests).subscribe({
     next: (estoqueIds: (number | undefined)[]) => {
+
       const venda: PostVendas = {
         itens_venda: this.itensVenda.map((item, index) => ({
-          estoque_id: estoqueIds[index] as number,
+          estoque_id:  estoqueIds[index] as number,
           quantidade: item.quantidade,
-          preco_unitario: item.preco_unitario
+          preco_unitario: +item.preco_unitario
         })),
         feira_id: feiraId,
         status_venda: this.venda ? this.venda.status_venda : 'finalizada',
@@ -195,40 +203,28 @@ const feir =
         cliente_id: null ,
       };
 
-      const request = this.venda
-        ? this.vendaService.editarVendas(this.venda.venda_id!, venda)
-        : this.vendaService.adicionarVendas(venda);
-
-      request.subscribe({
+       this.vendaService.adicionarVendas(venda).subscribe({
         next: (vend) => {
-          if (!this.venda) {
-            const feira =
-              this.feiras
-                .find((item) => item.feira_id === venda.feira_id)
-                ?.nome?.toLowerCase() !== 'sede';
-            if (feira) {
-              this.vendaService.consolidarVendas(vend.venda_id as number).subscribe();
-            }
-          }
+          this.vendaService.consolidarVendas(vend.venda_id as number).subscribe();
           this.toastr.success(
-            this.venda
-              ? 'Venda atualizada com sucesso!'
-              : 'Venda efetuada com sucesso!'
+           'Venda efetuada com sucesso!'
           );
           this.router.navigate(['/vendas']);
         },
         error: (err) => {
-          this.toastr.error('Erro ao salvar venda.');
+          this.toastr.error('Erro ao efetuar venda.');
           console.error(err);
         },
-      });
-    },
+      })
+          },
     error: (err) => {
       this.toastr.error('Erro ao buscar estoques.');
       console.error(err);
     }
   });
-}
+
+
+  }
 
   sair(): void {
     localStorage.removeItem('jwt');

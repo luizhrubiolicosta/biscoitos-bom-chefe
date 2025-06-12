@@ -66,7 +66,7 @@
             (click)="adicionarEstoque()"
             class="rounded-md bg-amber-600 text-white cursor-pointer px-4 py-2 text-sm font-medium hover:bg-amber-700 transition"
           >
-            Adicionar estoque
+            Adicionar estoque na Sede
           </button>
         </div>
       </div>
@@ -147,20 +147,33 @@
                 {{ estoque.localizacao }}
               </td>
               <td class="px-6 py-4 text-sm whitespace-nowrap space-x-2">
+                     <div
+                  *ngIf="estoque?.localizacao?.toLowerCase() === 'sede'"
+                  class="relative inline-block group"
+                >
                 <button
                   (click)="atualizarEstoque(estoque.estoque_id)"
-                  class="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition"
+                  class="mr-2 rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition"
                 >
                   Atualizar
                 </button>
-                <button
-                *ngIf="estoque?.localizacao?.toLowerCase() === 'sede'"
-                [disabled]="!estoque?.quantidade"
-                  ngClass="{{!estoque?.quantidade ? 'rounded bg-gray-500 px-3 py-1 text-white cursor-not-allowed' : 'rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition' }}"
-                  (click)="moverEstoque(estoque.estoque_id)"
-                >
-                  Mover estoque
-                </button>
+
+
+                  <button
+                    [disabled]="!estoque?.quantidade"
+                    [ngClass]="!estoque?.quantidade
+                      ? 'rounded bg-gray-500 px-3 py-1 text-white cursor-not-allowed'
+                      : 'rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition'"
+                    (click)="moverEstoque(estoque.estoque_id)"
+                  >
+                    <i class="fas fa-right-left"></i>
+                  </button>
+                    <div
+                      class="absolute bottom-full right-0 mb-2 w-max rounded bg-black px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50"
+                    >
+                      Mover estoque
+                    </div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -196,20 +209,33 @@
                 {{ estoque.localizacao }}
               </td>
               <td class="px-6 py-4 text-sm whitespace-nowrap space-x-2">
+                   <div
+                  *ngIf="estoque?.localizacao?.toLowerCase() === 'sede'"
+                  class="relative inline-block group"
+                >
                 <button
                   (click)="atualizarEstoque(estoque.estoque_id)"
-                  class="rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition"
+                  class="mr-2 rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition"
                 >
                   Atualizar
                 </button>
-                <button
-                *ngIf="estoque?.localizacao?.toLowerCase() === 'sede'"
-                [disabled]="!estoque?.quantidade"
-                ngClass="{{!estoque?.quantidade ? 'rounded bg-gray-500 px-3 py-1 text-white cursor-not-allowed' : 'rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition' }}"
-                  (click)="moverEstoque(estoque.estoque_id)"
-                >
-                  Mover estoque
-                </button>
+
+
+                  <button
+                    [disabled]="!estoque?.quantidade"
+                    [ngClass]="!estoque?.quantidade
+                      ? 'rounded bg-gray-500 px-3 py-1 text-white cursor-not-allowed'
+                      : 'rounded bg-amber-500 px-3 py-1 text-white hover:bg-amber-600 transition'"
+                    (click)="moverEstoque(estoque.estoque_id)"
+                  >
+                    <i class="fas fa-right-left"></i>
+                  </button>
+                    <div
+                      class="absolute bottom-full right-0 mb-2 w-max rounded bg-black px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50"
+                    >
+                      Mover estoque
+                    </div>
+                </div>
               </td>
             </tr>
           </ng-template>
@@ -226,3 +252,4 @@
     <div class="loader"></div>
   </div>
 </ng-template>
+

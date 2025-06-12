@@ -88,7 +88,7 @@ export class VendasService {
   }
 
   excluirVendas(id: number | undefined): Observable<any> {
-    const url = `${this.API_URL}/${id}`;
+    const url = `${this.API_URL}${id}`;
     return this.http.delete(url, {
       headers: this.baseHeaders,
     });

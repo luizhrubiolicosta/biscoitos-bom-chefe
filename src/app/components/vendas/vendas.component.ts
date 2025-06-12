@@ -23,10 +23,6 @@ export class VendasComponent {
 
   ngOnInit(): void {
     this.carregarProdutos();
-
-    this.searchControl.valueChanges.subscribe((search) =>
-      this.filtrarVendas(search as string)
-    );
   }
 
   carregarProdutos(): void {
@@ -43,20 +39,22 @@ export class VendasComponent {
     this.router.navigate(['/vendas/create']);
   }
 
-  excluirVenda(id: number | undefined): void {
-    this.vendasService.excluirVendas(id);
+
+   excluirVenda(id: number | undefined): void {
+    this.vendasService.excluirVendas(id).subscribe({
+      next: () => {
+        this.toastr.success('Venda excluída com sucesso!');
+        this.carregarProdutos();
+      },
+      error: (err) => {
+        this.toastr.error('Erro ao excluir venda.');
+        console.error(err);
+      },
+    });
   }
 
   editarVenda(id: number | undefined): void {
     this.router.navigate([`/vendas/create`, id]);
-  }
-
-  filtrarVendas(valor: string): void {
-    // const termo = valor.toLowerCase();
-    // this.vendasFiltrados =
-    //   this.vendas.filter((venda) =>
-    //     venda.feira_id?.toLowerCase().includes(termo)
-    //   ) || [];
   }
 
   sair(): void {

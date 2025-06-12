@@ -13,11 +13,10 @@ import { Produto, ProdutosService } from 'src/app/produtos.service';
 export class EstoqueCreateComponent implements OnInit {
   estoque?: Estoque;
   produtos: Produto[] = [];
-  feiras: Feira[] = [];
+  feira!: Feira;
   estoque_id?: number;
   estoqueForm: FormGroup;
   loading = true;
-  feirasCarregadas = false;
   produtosCarregados = false;
 
   constructor(
@@ -35,7 +34,6 @@ export class EstoqueCreateComponent implements OnInit {
       lote: ['', Validators.required],
       data_producao: ['', Validators.required],
       data_validade: ['', Validators.required],
-      localizacao: ['', Validators.required],
     });
   }
 
@@ -57,8 +55,7 @@ export class EstoqueCreateComponent implements OnInit {
       !this.estoqueForm.controls['produto_id'].value ||
       this.estoqueForm.controls['quantidade'].value  === null||
       this.estoqueForm.controls['quantidade'].value  === undefined||
-      !this.estoqueForm.controls['lote'].value ||
-      !this.estoqueForm.controls['localizacao'].value
+      !this.estoqueForm.controls['lote'].value
     );
   }
 
@@ -73,7 +70,6 @@ export class EstoqueCreateComponent implements OnInit {
         lote: this.estoque?.lote,
         data_producao: this.estoque?.data_producao,
         data_validade: this.estoque?.data_validade,
-        localizacao: this.estoque?.localizacao,
       });
       this.loading = false;
     });
@@ -91,16 +87,12 @@ export class EstoqueCreateComponent implements OnInit {
 
   carregarfeiras(): void {
     this.feirasService.getFeiras().subscribe((res) => {
-      const reversed = res.reverse();
-      this.feiras = reversed;
-      if (this.feiras.length) {
-        this.feirasCarregadas = true;
-      }
+      this.feira = (res.find(item => item.nome.toLowerCase() === 'sede')) as Feira;
     });
   }
 
   onSubmit(): void {
-    const feira = this.feiras.find(feira => feira.nome === this.estoqueForm.controls['localizacao'].value)
+
 
     if (this.estoque) {
       const estoque: PostEstoque = {
@@ -110,9 +102,9 @@ export class EstoqueCreateComponent implements OnInit {
         lote: this.estoqueForm.controls['lote'].value,
         data_producao: this.estoqueForm.controls['data_producao'].value,
         data_validade: this.estoqueForm.controls['data_validade'].value,
-        localizacao: this.estoqueForm.controls['localizacao'].value,
+        localizacao: this.feira.nome,
         data_atualizacao: new Date().toISOString().slice(0, 10),
-        feira_id: feira?.feira_id as number,
+        feira_id: this.feira?.feira_id as number,
       };
       this.estoqueService
         .editarEstoque(this.estoque?.estoque_id as number, estoque)
@@ -133,9 +125,9 @@ export class EstoqueCreateComponent implements OnInit {
         lote: this.estoqueForm.controls['lote'].value,
         data_producao: this.estoqueForm.controls['data_producao'].value,
         data_validade: this.estoqueForm.controls['data_validade'].value,
-        localizacao: this.estoqueForm.controls['localizacao'].value,
+        localizacao: this.feira.nome,
         data_atualizacao: new Date().toISOString().slice(0, 10),
-        feira_id: feira?.feira_id as number,
+        feira_id: this.feira?.feira_id as number,
       };
       this.estoqueService.adicionarEstoque(estoque).subscribe({
         next: () => {

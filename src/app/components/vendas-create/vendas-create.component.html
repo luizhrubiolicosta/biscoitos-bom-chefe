@@ -44,7 +44,7 @@
   </div>
 </div>
 <ng-container
-  *ngIf="!loading && feirasCarregadas && produtosCarregados; else loader"
+  *ngIf="!loading && feirasCarregadas; else loader"
 >
   <div
     class="bg-primary min-h-screen flex font-extralight flex-col justify-center items-center px-6 py-12 lg:px-8"
@@ -81,24 +81,28 @@
 
         <!-- Produto Form -->
         <div [formGroup]="produtoForm" class="mb-6">
-          <label for="produto" class="block text-sm font-medium text-gray-700"
-            >Selecione o produto</label
-          >
-
-          <select
-            id="produto"
-            formControlName="produto_id"
-            class="mt-1 w-full rounded-md border h-10 border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
-          >
-            <option
-              *ngFor="let produto of produtos"
-              [value]="produto.produto_id"
-              [disabled]="!vendaForm.controls['feira_id'].value"
+          <label for="produto" class="block text-sm font-medium text-gray-700">
+           Selecione o produto
+          </label>
+          <div *ngIf="vendaForm.controls['feira_id'].value; else disabledProduto">
+            <select
+              id="produto"
+              formControlName="produto_id"
+              class="mt-1 w-full rounded-md border h-10 border-gray-800 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm"
             >
-              {{ produto.nome }}
-            </option>
-          </select>
-        </div>
+              <option
+                *ngFor="let produto of produtos"
+                [value]="produto.produto_id"
+                [disabled]="!vendaForm.controls['feira_id'].value"
+              >
+                {{ produto.nome }}
+              </option>
+            </select>
+          </div>
+          <ng-template #disabledProduto>
+            <input class="mt-1 w-full rounded-md border h-10 border-gray-400 bg-gray-200 cursor-not-allowed px-3 py-2 text-gray-900 shadow-sm focus:border-amber-600 focus:outline-none focus:ring-amber-600 sm:text-sm" [disabled]="true"/>
+          </ng-template>
+      </div>
 
         <div>
           <button
