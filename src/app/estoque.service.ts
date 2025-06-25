@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Produto } from './produtos.service';
 import { Feira } from './feiras.service';
@@ -80,14 +80,18 @@ export class EstoqueService {
   constructor(private http: HttpClient) {}
 
   getEstoques(): Observable<Estoque[]> {
+    const params = new HttpParams()
+      .set('limit', 9999999999999);
     return this.http.get<Estoque[]>(this.API_URL, {
-      headers: this.getHeaders,
+      headers: this.getHeaders, params
     });
   }
 
   getProdutosEstoques(id: number): Observable<Estoque[]> {
+       const params = new HttpParams()
+      .set('limit', 9999999999999);
     return this.http.get<Estoque[]>(`${this.API_URL}produto/${id}`, {
-      headers: this.getHeaders,
+      headers: this.getHeaders,params
     });
   }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Feira {
@@ -24,7 +24,9 @@ export class FeirasService {
   constructor(private http: HttpClient) {}
 
   getFeiras(): Observable<Feira[]> {
-    return this.http.get<Feira[]>(this.API_URL, { headers: this.headers });
+     const params = new HttpParams()
+          .set('limit', 9999999999999);
+    return this.http.get<Feira[]>(this.API_URL, { headers: this.headers, params });
   }
 
   adicionarFeira(Feira: Feira): Observable<Feira> {

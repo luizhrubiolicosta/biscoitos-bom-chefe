@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Produto {
@@ -29,12 +29,14 @@ export class ProdutosService {
   constructor(private http: HttpClient) {}
 
   getProdutos(): Observable<Produto[]> {
+    const params = new HttpParams()
+              .set('limit', 9999999999999);
     return this.http.get<Produto[]>(this.API_URL, {
-      headers: this.headers,
+      headers: this.headers,params
     });
   }
 
-  getProdutosPorFeira(feiraId: number, skip = 0, limit = 100): Observable<Produto[]> {
+  getProdutosPorFeira(feiraId: number, skip = 0, limit = 99999999999): Observable<Produto[]> {
   const params = {
     skip: skip.toString(),
     limit: limit.toString(),
