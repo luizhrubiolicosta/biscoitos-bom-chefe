@@ -184,7 +184,7 @@ const feir =
 
   const estoqueRequests = this.itensVenda.map(item =>
     this.estoqueService.getProdutosEstoques(item.produto_id).pipe(
-      map(result => result.find(i => i.localizacao.toLowerCase() === feir?.nome.toLowerCase() && i.quantidade > 0)?.estoque_id)
+      map(result => result.find(i => i?.feira_id === feir?.feira_id && i.quantidade > 0)?.estoque_id)
     )
   );
 
@@ -205,7 +205,9 @@ const feir =
 
        this.vendaService.adicionarVendas(venda).subscribe({
         next: (vend) => {
-          this.vendaService.consolidarVendas(vend.venda_id as number).subscribe();
+          if(vend.feira?.nome.toLocaleLowerCase() !== 'sede') {
+            this.vendaService.consolidarVendas(vend.venda_id as number).subscribe();
+          }
           this.toastr.success(
            'Venda efetuada com sucesso!'
           );

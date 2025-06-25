@@ -43,6 +43,7 @@ export interface PostVendas {
   status_venda?: string;
   valor_total?: number;
   cliente_id?: number | null;
+  feira?: Feira
 }
 
 @Injectable({
